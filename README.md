@@ -13,7 +13,7 @@ A little example, using tor as relay and proxy at the same time.
 ```yaml
 services:
   tor:
-    image: archfan/tor-docker:latest
+    image: archhfan/tor-docker:latest
     environment:
       TOR_Nickname: MyRelayNick
       TOR_ContactInfo: mail@example.com

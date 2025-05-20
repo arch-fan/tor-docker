@@ -1,5 +1,6 @@
 services:
   tor:
+    image: archhfan/tor-docker:latest
     container_name: tor
     restart: always
     #environment:
