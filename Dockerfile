@@ -1,6 +1,8 @@
 FROM alpine:3.18
 
-RUN apk add --no-cache tor
+RUN apk add --no-cache tor && \
+  chown -R tor:tor /etc/tor
+
 
 USER tor
 
