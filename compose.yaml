@@ -1,0 +1,17 @@
+services:
+  tor:
+    container_name: tor
+    restart: always
+    #environment:
+    # TZ: Europe/Madrid
+    # Your own timezone
+    #ports:
+    #- 9001:9001
+    #- 9030:9030
+    #- 127.0.0.1:9050:9050
+    # Forward the ports you need
+    volumes:
+      - tor-data:/var/lib/tor
+
+volumes:
+  tor-data:
