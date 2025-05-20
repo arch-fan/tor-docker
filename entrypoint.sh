@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 config_file="/etc/tor/torrc"
 : >"$config_file"
