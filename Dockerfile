@@ -1,6 +1,7 @@
 FROM alpine:3.18
 
 RUN apk add --no-cache tor && \
+  mkdir -p /etc/tor && \
   chown -R tor:tor /etc/tor
 
 
