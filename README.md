@@ -1,5 +1,7 @@
 # Tor For Docker
 
+[#LaLigaGate](https://laligagate.com/)
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/archhfan/tor-docker)](https://hub.docker.com/r/archhfan/tor-docker)
 [![Docker Stars](https://img.shields.io/docker/stars/archhfan/tor-docker)](https://hub.docker.com/r/archhfan/tor-docker)
 
@@ -59,5 +61,3 @@ This repository exists because Javier Tebas, the president of LaLiga, has taken 
 It’s unacceptable that in 2025, a private company can control the traffic of an entire country over something as trivial as a budget smartphone, without any valid justification. That’s why I created this repository—to give anyone easy access to the Tor network.
 
 ---
-
-[#LaLigaGate](https://laligagate.com/)
