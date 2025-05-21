@@ -1,5 +1,8 @@
 # Tor For Docker
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/archhfan/tor-docker)](https://hub.docker.com/r/archhfan/tor-docker)
+[![Docker Stars](https://img.shields.io/docker/stars/archhfan/tor-docker)](https://hub.docker.com/r/archhfan/tor-docker)
+
 <div align="center">
   <img height="256" src="https://github.com/user-attachments/assets/c402eb46-c06e-4a98-a6be-7eba3d02581a">
 </div>
