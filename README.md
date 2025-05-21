@@ -43,3 +43,21 @@ ENV Variable      | torrc Directive | Value          | Effect                   
 | `TOR_1_ORPort`    | `ORPort`        | `[::]:9001`    | Enables IPv6 relay-to-relay on TCP port 9001.                   |
 | `TOR_DirPort`     | `DirPort`       | `9030`         | Serves directory information on TCP port 9030.                  |
 | `TOR_DataDir`     | `DataDirectory` | `/var/lib/tor` | Places Tor’s state, keys, and caches under `/var/lib/tor`.      |
+
+## Motivation
+
+#### Spanish
+---
+Este repositorio viene gracias a que Javier Tebas, director de LaLiga, se dedica a cortar la conexión de CDNs famosas como Cloudflare, o de proveedores de servicio como Vercel o Netlify. Estos bloquean las CDNs los días que hay partidos de LaLiga, afectando a miles de usuarios de ciertas ISPs sobre las que tienen poder, haciendo que muchas páginas webs y servicios se queden inhabilitados para los usuarios finales.
+
+No puede ser que en 2025, una empresa privada esté controlando el tráfico de un país solamente por un móvil económico, sin ningún tipo de motivo de peso. Por eso, decidí crear este repositorio y que cualquier persona tenga accesible la red tor de manera sencilla.
+
+#### English
+--- 
+This repository exists because Javier Tebas, the president of LaLiga, has taken to cutting off connections to major CDNs like Cloudflare, as well as service providers such as Vercel and Netlify. These CDNs are blocked on match days, impacting thousands of users on certain ISPs under his influence, leaving many websites and services inaccessible to end users.
+
+It’s unacceptable that in 2025, a private company can control the traffic of an entire country over something as trivial as a budget smartphone, without any valid justification. That’s why I created this repository—to give anyone easy access to the Tor network.
+
+---
+
+[#LaLigaGate](https://laligagate.com/)
