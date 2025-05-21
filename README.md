@@ -1,6 +1,10 @@
 # Tor For Docker
 
-You can configure your tor container with environment variables. Just write a `TOR_` prefix at your environment variables, and they will be translated into a `torrc` file at `/etc/tor/torrc` inside the container.
+<div align="center">
+  <img height="256" src="https://github.com/user-attachments/assets/c402eb46-c06e-4a98-a6be-7eba3d02581a">
+</div>
+
+You can configure your tor container with environment variables. Just write a `TOR_` prefix at your environment variables, and they will be translated into a `torrc` file at `/etc/tor/torrc` inside the container. For multiple settings with the same key, just prefix a number to the environment key like: `TOR_0_Foo`, `TOR_1_Foo`...
 
 This container can work as a relay or a proxy, whatever you want to configure. Minimum requirements are to know how `torrc` file works (it's very easy, looking some examples below you will now hoy to use it)
 
@@ -32,7 +36,7 @@ ENV Variable      | torrc Directive | Value          | Effect                   
 | ----------------- | --------------- | -------------- | --------------------------------------------------------------- |
 | `TOR_SocksPort`   | `SocksPort`     | `0.0.0.0:9050` | Opens a SOCKS listener on all interfaces for client use.        |
 | `TOR_RunAsDaemon` | `RunAsDaemon`   | `0`            | Keeps Tor in the foreground (necessary in Docker containers).   |
-| `TOR_ORPort`      | `ORPort`        | `9001`         | Enables IPv4 relay-to-relay (“onion routing”) on TCP port 9001. |
-| `TOR_ORPort`      | `ORPort`        | `[::]:9001`    | Enables IPv6 relay-to-relay on TCP port 9001.                   |
+| `TOR_0_ORPort`    | `ORPort`        | `9001`         | Enables IPv4 relay-to-relay (“onion routing”) on TCP port 9001. |
+| `TOR_1_ORPort`    | `ORPort`        | `[::]:9001`    | Enables IPv6 relay-to-relay on TCP port 9001.                   |
 | `TOR_DirPort`     | `DirPort`       | `9030`         | Serves directory information on TCP port 9030.                  |
 | `TOR_DataDir`     | `DataDirectory` | `/var/lib/tor` | Places Tor’s state, keys, and caches under `/var/lib/tor`.      |
