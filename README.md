@@ -9,25 +9,32 @@
   <img height="256" src="https://github.com/user-attachments/assets/c402eb46-c06e-4a98-a6be-7eba3d02581a">
 </div>
 
-You can configure your tor container with environment variables. Just write a `TOR_` prefix at your environment variables, and they will be translated into a `torrc` file at `/etc/tor/torrc` inside the container. For multiple settings with the same key, just prefix a number to the environment key like: `TOR_0_Foo`, `TOR_1_Foo`...
+You can configure your tor container with environment variables. Just write a `TOR_` prefix at your environment variables and they will be translated into a `torrc` file at `/etc/tor/torrc` inside the container. For multiple settings with the same directive, prefix a number like `TOR_0_ORPort`, `TOR_1_ORPort` and so on (the entrypoint sorts the variables to keep ordering stable).
 
-This container can work as a relay or a proxy, whatever you want to configure. Minimum requirements are to know how `torrc` file works (it's very easy, looking some examples below you will now hoy to use it)
+This container can work as a relay or a proxy, whatever you want to configure. Minimum requirements are to know how `torrc` works (it's very easy—looking at the examples below you will know how to use it).
 
-Container works as proxy and relay by default. Override the configuration with environment variables and disable them.
+Container works as proxy and relay by default. Override the configuration with environment variables to disable or change ports.
 
 ## Docker Compose Example
 
-A little example, using tor as relay and proxy at the same time.
+A little example, using tor as relay and proxy at the same time. Build locally if you are working on this repo; otherwise pull the published image.
 
 ```yaml
 services:
   tor:
     image: archhfan/tor-docker:latest
+    # build: .     # uncomment when building locally
     environment:
       TOR_Nickname: MyRelayNick
       TOR_ContactInfo: mail@example.com
+      # TOR_SocksPort: 0.0.0.0:9050
+      # TOR_ORPort: 9001
     volumes:
       - tor-data:/var/lib/tor
+    ports:
+      - "9001:9001"   # Relay ORPort
+      - "9030:9030"   # Relay DirPort
+      - "127.0.0.1:9050:9050" # Local SOCKS proxy
 
 volumes:
   tor-data:
@@ -44,7 +51,14 @@ ENV Variable      | torrc Directive | Value          | Effect                   
 | `TOR_0_ORPort`    | `ORPort`        | `9001`         | Enables IPv4 relay-to-relay (“onion routing”) on TCP port 9001. |
 | `TOR_1_ORPort`    | `ORPort`        | `[::]:9001`    | Enables IPv6 relay-to-relay on TCP port 9001.                   |
 | `TOR_DirPort`     | `DirPort`       | `9030`         | Serves directory information on TCP port 9030.                  |
-| `TOR_DataDir`     | `DataDirectory` | `/var/lib/tor` | Places Tor’s state, keys, and caches under `/var/lib/tor`.      |
+| `TOR_DataDirectory` | `DataDirectory` | `/var/lib/tor` | Places Tor’s state, keys, and caches under `/var/lib/tor`.      |
+
+### How the entrypoint works
+- At startup the entrypoint rewrites `/etc/tor/torrc` using every environment variable prefixed with `TOR_`.
+- Variables are sorted before writing; if you need a specific order for repeated directives, number them (`TOR_0_ORPort`, `TOR_1_ORPort`). For more than nine entries, zero‑pad numbers (`TOR_00_...`).
+- Empty values are skipped to avoid generating invalid `torrc` lines.
+- The data directory is created if missing and ownership is fixed, then the process drops privileges with `su-exec` to run Tor as the `tor` user.
+- Non-root/runtime compatibility (K8s `runAsNonRoot`, rootless Docker/Podman): when PID 1 is not root, the entrypoint skips `chown`/`su-exec` and runs as-is. Ensure `/etc/tor/torrc` and your `DataDirectory` are writable (e.g., mount a writable volume, set `fsGroup`, or pre-chown with an initContainer).
 
 ## Motivation
 

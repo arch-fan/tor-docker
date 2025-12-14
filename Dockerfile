@@ -1,11 +1,11 @@
-FROM alpine:3.18
+FROM alpine:3.20
 
-RUN apk add --no-cache tor && \
-  chown -R tor:nogroup /etc/tor
-
-USER tor
+RUN apk add --no-cache tor su-exec && \
+  mkdir -p /var/lib/tor && \
+  chown -R tor:nogroup /etc/tor /var/lib/tor
 
 COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENV TOR_SocksPort=0.0.0.0:9050 \
   TOR_RunAsDaemon=0 \
@@ -19,4 +19,3 @@ EXPOSE 9001/tcp 9030/tcp
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["tor", "-f", "/etc/tor/torrc"]
-

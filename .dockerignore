@@ -1,0 +1,6 @@
+.git
+.gitignore
+*.log
+tmp
+node_modules
+dist

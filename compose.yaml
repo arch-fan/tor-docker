@@ -1,16 +1,18 @@
 services:
   tor:
     image: archhfan/tor-docker:latest
+    # build: .  # uncomment to build from the local Dockerfile
     container_name: tor
     restart: always
-    #environment:
-    # TZ: Europe/Madrid
-    # Your own timezone
-    #ports:
-    #- 9001:9001
-    #- 9030:9030
-    #- 127.0.0.1:9050:9050
-    # Forward the ports you need
+    # environment:
+    #   TOR_Nickname: MyRelayNick
+    #   TOR_ContactInfo: mail@example.com
+    #   TZ: Europe/Madrid
+    # ports:
+    #   - "9001:9001"          # Relay ORPort
+    #   - "9030:9030"          # DirPort
+    #   - "127.0.0.1:9050:9050" # Local SOCKS proxy
+    # Un-comment the ports/environment you need.
     volumes:
       - tor-data:/var/lib/tor
 
