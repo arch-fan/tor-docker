@@ -17,23 +17,22 @@ Container works as proxy and relay by default. Override the configuration with e
 
 ## Docker Compose Example
 
-A little example, using tor as relay and proxy at the same time. Build locally if you are working on this repo; otherwise pull the published image.
+A little example, using tor as relay and proxy at the same time.
 
 ```yaml
 services:
   tor:
     image: archhfan/tor-docker:latest
-    # build: .     # uncomment when building locally
     environment:
       TOR_Nickname: MyRelayNick
       TOR_ContactInfo: mail@example.com
+      TOR_ORPort: 9001
+      # Not necessary, because service acts as a proxy by default
       # TOR_SocksPort: 0.0.0.0:9050
-      # TOR_ORPort: 9001
     volumes:
       - tor-data:/var/lib/tor
     ports:
       - "9001:9001"   # Relay ORPort
-      - "9030:9030"   # Relay DirPort
       - "127.0.0.1:9050:9050" # Local SOCKS proxy
 
 volumes:
@@ -47,31 +46,31 @@ Default values of the environment variables with their respective directive.
 ENV Variable      | torrc Directive | Value          | Effect                                                          |
 | ----------------- | --------------- | -------------- | --------------------------------------------------------------- |
 | `TOR_SocksPort`   | `SocksPort`     | `0.0.0.0:9050` | Opens a SOCKS listener on all interfaces for client use.        |
-| `TOR_RunAsDaemon` | `RunAsDaemon`   | `0`            | Keeps Tor in the foreground (necessary in Docker containers).   |
-| `TOR_0_ORPort`    | `ORPort`        | `9001`         | Enables IPv4 relay-to-relay (“onion routing”) on TCP port 9001. |
-| `TOR_1_ORPort`    | `ORPort`        | `[::]:9001`    | Enables IPv6 relay-to-relay on TCP port 9001.                   |
-| `TOR_DirPort`     | `DirPort`       | `9030`         | Serves directory information on TCP port 9030.                  |
 | `TOR_DataDirectory` | `DataDirectory` | `/var/lib/tor` | Places Tor’s state, keys, and caches under `/var/lib/tor`.      |
 
 ### How the entrypoint works
 - At startup the entrypoint rewrites `/etc/tor/torrc` using every environment variable prefixed with `TOR_`.
 - Variables are sorted before writing; if you need a specific order for repeated directives, number them (`TOR_0_ORPort`, `TOR_1_ORPort`). For more than nine entries, zero‑pad numbers (`TOR_00_...`).
 - Empty values are skipped to avoid generating invalid `torrc` lines.
-- The data directory is created if missing and ownership is fixed, then the process drops privileges with `su-exec` to run Tor as the `tor` user.
-- Non-root/runtime compatibility (K8s `runAsNonRoot`, rootless Docker/Podman): when PID 1 is not root, the entrypoint skips `chown`/`su-exec` and runs as-is. Ensure `/etc/tor/torrc` and your `DataDirectory` are writable (e.g., mount a writable volume, set `fsGroup`, or pre-chown with an initContainer).
 
 ## Motivation
 
-#### Spanish
----
+### Spanish
 Este repositorio viene gracias a que Javier Tebas, director de LaLiga, se dedica a cortar la conexión de CDNs famosas como Cloudflare, o de proveedores de servicio como Vercel o Netlify. Estos bloquean las CDNs los días que hay partidos de LaLiga, afectando a miles de usuarios de ciertas ISPs sobre las que tienen poder, haciendo que muchas páginas webs y servicios se queden inhabilitados para los usuarios finales.
 
-No puede ser que en 2025, una empresa privada esté controlando el tráfico de un país solamente por un móvil económico, sin ningún tipo de motivo de peso. Por eso, decidí crear este repositorio y que cualquier persona tenga accesible la red tor de manera sencilla.
+No puede ser que en 2026, una empresa privada esté controlando el tráfico de un país solamente por un móvil económico, sin ningún tipo de motivo de peso. Por eso, decidí crear este repositorio y que cualquier persona tenga accesible la red tor de manera sencilla.
 
-#### English
---- 
+> [!NOTE]
+> El Congreso de los Diputados tramitó la PNL 161/002757 para revisar los bloqueos de IP ordenados judicialmente y evitar que afecten a servicios legítimos o a terceros ajenos. La iniciativa cita expresamente los bloqueos vinculados a LaLiga, IPs compartidas como Cloudflare y casos como Transporta’m.  
+> Fuente oficial: [BOCG, Serie D, núm. 443, PNL 161/002757](https://www.congreso.es/public_oficiales/L15/CONG/BOCG/D/BOCG-15-D-443.PDF).  
+> Contexto sobre su aprobación: [Demócrata — El Congreso actuará contra los bloqueos masivos de IP por parte de LaLiga](https://www.democrata.es/politica/congreso-y-senado/congreso-bloqueo-ip-la-liga/).
+
+### English
 This repository exists because Javier Tebas, the president of LaLiga, has taken to cutting off connections to major CDNs like Cloudflare, as well as service providers such as Vercel and Netlify. These CDNs are blocked on match days, impacting thousands of users on certain ISPs under his influence, leaving many websites and services inaccessible to end users.
 
-It’s unacceptable that in 2025, a private company can control the traffic of an entire country over something as trivial as a budget smartphone, without any valid justification. That’s why I created this repository—to give anyone easy access to the Tor network.
+It’s unacceptable that in 2026, a private company can control the traffic of an entire country over something as trivial as a budget smartphone, without any valid justification. That’s why I created this repository—to give anyone easy access to the Tor network.
 
----
+> [!NOTE]
+> The Spanish Congress of Deputies processed PNL 161/002757 to review court-ordered IP blocking measures and prevent them from affecting legitimate services or unrelated third parties. The proposal explicitly mentions blocking measures linked to LaLiga, shared IPs such as Cloudflare’s, and cases such as Transporta’m.  
+> Official source: [BOCG, Series D, no. 443, PNL 161/002757](https://www.congreso.es/public_oficiales/L15/CONG/BOCG/D/BOCG-15-D-443.PDF).  
+> Context on its approval: [Demócrata — The Congress will act against LaLiga’s mass IP blocking](https://www.democrata.es/politica/congreso-y-senado/congreso-bloqueo-ip-la-liga/).
