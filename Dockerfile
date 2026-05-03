@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.23
 
 RUN apk add --no-cache tor su-exec && \
   mkdir -p /var/lib/tor && \
