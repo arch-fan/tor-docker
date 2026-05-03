@@ -1,6 +1,10 @@
-FROM alpine:3.23
+ARG ALPINE_VERSION
 
-RUN apk add --no-cache tor && \
+FROM alpine:${ALPINE_VERSION}
+
+ARG TOR_VERSION
+
+RUN apk add --no-cache "tor=${TOR_VERSION}" && \
   mkdir -p /run/tor && \
   chown -R tor:tor /var/lib/tor /run/tor && \
   chmod 0700 /var/lib/tor /run/tor

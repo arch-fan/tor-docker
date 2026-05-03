@@ -3,8 +3,21 @@ name: Build & Publish Multi-Arch Docker Image on Tag
 on:
   push:
     tags:
-      # Only run on tags like “0.1”, “1.2”, etc.
-      - "[0-9]*.[0-9]*"
+      - "tor*-alpine*"
+  workflow_dispatch:
+    inputs:
+      tor_version:
+        description: Tor version
+        required: true
+        type: string
+      alpine_version:
+        description: Alpine version
+        required: true
+        type: string
+    
+env:
+  DOCKERHUB_USER: archhfan
+  PLATFORMS: linux/amd64,linux/arm64
 
 jobs:
   build-and-push:
@@ -12,26 +25,55 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Resolve versions
+        id: versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            image_tag="$GITHUB_REF_NAME"
+            version_part="${image_tag#tor}"
+            tor_version="${version_part%%-alpine*}"
+            alpine_version="${version_part##*-alpine}"
+          else
+            tor_version="${{ inputs.tor_version }}"
+            alpine_version="${{ inputs.alpine_version }}"
+            image_tag="tor${tor_version}-alpine${alpine_version}"
+          fi
+
+          {
+            printf 'tor=%s\n' "$tor_version"
+            printf 'alpine=%s\n' "$alpine_version"
+            printf 'image_tag=%s\n' "$image_tag"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: ${{ env.PLATFORMS }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
+        with:
+          platforms: ${{ env.PLATFORMS }}
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USER }}
+          username: ${{ env.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
-          context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ env.PLATFORMS }}
           push: true
+          build-args: |
+            ALPINE_VERSION=${{ steps.versions.outputs.alpine }}
+            TOR_VERSION=${{ steps.versions.outputs.tor }}
           tags: |
-            ${{ secrets.DOCKERHUB_USER }}/${{ github.event.repository.name }}:${{ github.ref_name }}
-            ${{ secrets.DOCKERHUB_USER }}/${{ github.event.repository.name }}:latest
+            ${{ env.DOCKERHUB_USER }}/${{ github.event.repository.name }}:${{ steps.versions.outputs.image_tag }}
+            ${{ env.DOCKERHUB_USER }}/${{ github.event.repository.name }}:latest
