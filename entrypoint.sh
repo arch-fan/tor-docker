@@ -2,24 +2,9 @@
 
 set -e
 
-config_file="/etc/tor/torrc"
-config_dir=$(dirname "$config_file")
-data_dir="${TOR_DataDirectory:-/var/lib/tor}"
-run_prefix=""
+config_file="/run/tor/torrc"
 
-if [ "$(id -u)" -eq 0 ]; then
-  mkdir -p "$data_dir"
-  chown -R tor:nogroup "$data_dir" "$config_dir"
-  run_prefix="su-exec tor"
-else
-  # Non-root (K8s RunAsNonRoot, rootless Docker/Podman): best effort to ensure dirs exist.
-  mkdir -p "$data_dir" 2>/dev/null || true
-fi
-
-if ! : >"$config_file"; then
-  echo "ERROR: cannot write $config_file. Provide writable permissions (fsGroup, initContainer chown, or run as root)." >&2
-  exit 1
-fi
+: > "$config_file"
 
 env | grep -e '^TOR_' | LC_COLLATE=C sort | while IFS= read -r line; do
   var_name=${line%%=*}
@@ -32,17 +17,10 @@ env | grep -e '^TOR_' | LC_COLLATE=C sort | while IFS= read -r line; do
   esac
 
   # Skip empty values to avoid emitting invalid torrc lines.
+  [ -z "$directive" ] && continue
   [ -z "$var_value" ] && continue
 
-  printf "%s %s\n" "$directive" "$var_value" >>"$config_file"
+  printf "%s %s\n" "$directive" "$var_value" >> "$config_file"
 done
 
-if [ $# -eq 0 ]; then
-  set -- tor -f "$config_file"
-fi
-
-if [ -n "$run_prefix" ]; then
-  exec $run_prefix "$@"
-else
-  exec "$@"
-fi
+exec "$@"
