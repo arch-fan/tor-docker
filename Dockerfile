@@ -8,10 +8,11 @@ RUN apk add --no-cache tor && \
 COPY --link entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENV TOR_SocksPort=0.0.0.0:9050 \
-  TOR_RunAsDaemon=0 \
   TOR_DataDirectory=/var/lib/tor
 
 USER tor
+
+EXPOSE 9050/tcp
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["tor", "-f", "/run/tor/torrc"]
