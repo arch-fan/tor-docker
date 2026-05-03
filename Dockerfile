@@ -14,7 +14,6 @@ ENV TOR_SocksPort=0.0.0.0:9050 \
   TOR_DirPort=9030 \
   TOR_DataDirectory=/var/lib/tor
 
-VOLUME ["/var/lib/tor"]
 EXPOSE 9001/tcp 9030/tcp
 
 ENTRYPOINT ["/entrypoint.sh"]
